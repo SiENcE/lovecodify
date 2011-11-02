@@ -1,7 +1,9 @@
--- Codify:iPad App - wrapper class
+-- LoveCodify is a Wrapper Class to run Codify/Codea Scripts with Love2D
 -- by Florian^SiENcE^schattenkind.net
 --
--- You can use the Love2d.org runtime to code Codify Apps on Mac/Linux/Win
+-- You can use the http://love2d.org/ runtime to code Codify Apps on MacOSX/Linux/Windows.
+-- Beware, it's unfinished, but samples are running.
+--
 -- Just include the this in your Codify project:
 -- dofile ("loveCodify.lua")
 
