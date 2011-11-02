@@ -14,9 +14,20 @@
 iparameterList = {}
 parameterList = {}
 
+BEGAN = 1
+MOVING = 2
+ENDED = 3
+
 CurrentTouch = {}
 CurrentTouch.x = 0
 CurrentTouch.y = 0
+--  CurrentTouch.prevX
+--  CurrentTouch.prevY
+--  CurrentTouch.deltaX
+--  CurrentTouch.deltaY
+--  CurrentTouch.id
+CurrentTouch.state = BEGAN
+--  CurrentTouch.tapCount
 
 Gravity = {}
 Gravity.x = 0
@@ -89,7 +100,13 @@ function translate(dx, dy)
 	love.graphics.translate( dx, dy )
 end
 
-function rotate()
+function rotate(angle)
+	love.graphics.rotate( angle )
+end
+
+-- TODO: add scale(amount)
+function scale(sx, sy)
+	love.graphics.scale( sx, sy )
 end
 
 -------------------
@@ -218,12 +235,22 @@ function love.load()
 	setup()
 end
 
+function love.mousereleased(x, y, button)
+   if button == "l" then
+      CurrentTouch.state = ENDED
+   end
+end
+
 function love.update(dt)
 	if love.mouse.isDown("l") then
+		--TODO: lastPosition check
+		--CurrentTouch.state = BEGAN
+
 		-- get Mouse position as Touch position
 		-- publish globally
 		CurrentTouch.x = love.mouse.getX()
 		CurrentTouch.y = love.mouse.getY()
+		CurrentTouch.state = MOVING
 		
 		-- publish to touched callback
 		local touch = {}
@@ -232,9 +259,15 @@ function love.update(dt)
 		if touched then touched(touch) end
 	end
 
-	if love.mouse.isDown("r") then
-		Gravity.x = Gravity.x + 0.01
+	-- use Up,Down,Left,Right Keys to change Gravity
+	if love.keyboard.isDown("up") then
 		Gravity.y = Gravity.y + 0.01
+	elseif love.keyboard.isDown("down") then
+		Gravity.y = Gravity.y - 0.01
+	elseif love.keyboard.isDown("left") then
+		Gravity.x = Gravity.x + 0.01
+	elseif love.keyboard.isDown("right") then
+		Gravity.x = Gravity.x - 0.01
 	end
 end
 
@@ -259,7 +292,17 @@ function love.draw()
 		love.graphics.print( tostring(v), 80, 300+14*i)
 		i=i+1
 	end
-	
+
+	-- print FPS
+	love.graphics.setColor(255,0,0,255)
+	love.graphics.print( "FPS: ", WIDTH-65, 14)
+	love.graphics.print( love.timer.getFPS( ), WIDTH-35, 14)
+
+	-- print Gravity
+	love.graphics.print( "GravityX: ", WIDTH-92, 34)
+	love.graphics.print( Gravity.x, WIDTH-35, 34)
+	love.graphics.print( "GravityY: ", WIDTH-92, 54)
+	love.graphics.print( Gravity.y, WIDTH-35, 54)
 	-- in love we have to reset the color after drawing
 	love.graphics.setColor(255,255,255,255)
 end

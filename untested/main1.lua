@@ -4,7 +4,7 @@ LONGLINE = math.pow(3,6)
 -- Use this function to perform your initial setup
 function setup()
     print(string.format("Hello World! %d %d", WIDTH, LONGLINE))
-    iparameter("dimension",4,5)
+    iparameter("dimension",1,5)
 end
 
 -- This function gets called once every frame
