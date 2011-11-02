@@ -1,0 +1,11 @@
+LoveCodify is a Wrapper Class to run Codify/Codea Scripts with Love2D
+by Florian^SiENcE^schattenkind.net
+
+You can use the http://love2d.org/ runtime to code Codify Apps on MacOSX/Linux/Windows.
+
+
+Just include the this in your Codify project:
+
+dofile ("loveCodify.lua")
+
+current state: unfinished
