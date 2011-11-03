@@ -4,7 +4,6 @@
 -- https://gist.github.com/1328664
 dofile ("loveCodify.lua")
 
-dofile ("loveCodify.lua")
 dofile ("Game/Game object classes.lua")
 dofile ("Game/Levels.lua")
 dofile ("Game/Numbers.lua")
