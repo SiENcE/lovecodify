@@ -1,3 +1,9 @@
+-- got it from here
+-- credits to voiceoftreason
+-- http://twolivesleft.com/Codea/Talk/discussion/comment/46
+-- https://gist.github.com/1328664
+dofile ("loveCodify.lua")
+
 dofile ("loveCodify.lua")
 dofile ("Game/Game object classes.lua")
 dofile ("Game/Levels.lua")
