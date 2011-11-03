@@ -33,11 +33,71 @@ Gravity = {}
 Gravity.x = 0
 Gravity.y = 0
 
---fill
---Draw filled shape.
---line
---Draw outlined shape.
+-- Fill Modes - line | fill
 fillMode="line"
+
+-- Rectangle Modes
+CENTER = 1
+RADIUS = 2
+CORNER = 3
+CORNERS = 4
+rectangleMode = CORNER
+
+ROUND = 1
+SQUARE = 2
+PROJECT = 3
+-- LineCap Modes
+lineCapsMode = ROUND
+
+-- class.lua
+-- Compatible with Lua 5.1 (not 5.0).
+function class(base, init)
+   local c = {}    -- a new class instance
+   if not init and type(base) == 'function' then
+      init = base
+      base = nil
+   elseif type(base) == 'table' then
+    -- our new class is a shallow copy of the base class!
+      for i,v in pairs(base) do
+         c[i] = v
+      end
+      c._base = base
+   end
+   -- the class will be the metatable for all its objects,
+   -- and they will look up their methods in it.
+   c.__index = c
+
+   -- expose a constructor which can be called by <classname>(<args>)
+   local mt = {}
+   mt.__call = function(class_tbl, ...)
+   local obj = {}
+   setmetatable(obj,c)
+   if class_tbl.init then
+      class_tbl.init(obj,...)
+   else 
+      -- make sure that any stuff from the base class is initialized!
+      if base and base.init then
+      base.init(obj, ...)
+      end
+   end
+   return obj
+   end
+   c.init = init
+   c.is_a = function(self, klass)
+      local m = getmetatable(self)
+      while m do 
+         if m == klass then return true end
+         m = m._base
+      end
+      return false
+   end
+   setmetatable(c, mt)
+   return c
+end
+
+-------------------
+-- Graphics
+-------------------
 
 function color(r,g,b,a)
 	local color = {}
@@ -63,7 +123,7 @@ end
 
 function ellipse(x,y,width,heigt)
 	love.graphics.circle( fillMode, x, y, width/2 )
-	love.graphics.setColor(255,255,255,255)
+--	love.graphics.setColor(255,255,255,255)
 end
 
 function line(x1,y1,x2,y2)
@@ -110,6 +170,11 @@ function scale(sx, sy)
 end
 
 -------------------
+-- Vector
+-------------------
+require ("vector")
+
+-------------------
 -- Transform Management
 -------------------
 function pushMatrix()
@@ -149,17 +214,24 @@ function fill(red,green,blue,alpha)
 end
 
 function lineCapMode(mode)
--- ROUND | SQUARE | PROJECT
+	lineCapsMode = mode
 end
 
 function noSmooth()
 end
+
 function noFill()
 	fillmode = "line"
 end
+
 function noStroke()
 end
+
 function noTint()
+end
+
+function rectMode(mode)
+	rectangleMode=mode
 end
 
 function smooth()
