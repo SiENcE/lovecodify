@@ -4,6 +4,6 @@ function love.conf(t)
     t.identity = nil            -- The name of the save directory (string)
     t.version = 0               -- The LÖVE version this game was made for (number)
     t.console = true           -- Attach a console (boolean, Windows only)
-    t.screen.width = 640        -- The window width (number)
-    t.screen.height = 480       -- The window height (number)
+    t.screen.width = 800        -- The window width (number)
+    t.screen.height = 768       -- The window height (number)
 end
