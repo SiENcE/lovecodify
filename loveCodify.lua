@@ -314,6 +314,12 @@ function love.mousereleased(x, y, button)
 end
 
 function love.update(dt)
+	-- Use sleep to cap FPS at 30
+	if dt < 1/30 then
+		love.timer.sleep(1000 * (1/30 - dt))
+	end
+	
+	-- use Mouse for Touch interaction
 	if love.mouse.isDown("l") then
 		--TODO: lastPosition check
 		--CurrentTouch.state = BEGAN
