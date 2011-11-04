@@ -1,5 +1,5 @@
 -- got it from here
--- credits to Rob_rain & blissapp
+-- credits to Robert Rainthorpe & blissapp
 -- http://twolivesleft.com/Codify/Talk/discussion/34/my-first-lua-script-fireworks
 -- https://gist.github.com/1326513
 dofile ("loveCodify.lua")
@@ -10,7 +10,7 @@ iparameter("clumps",1,20,4)
 clumps= 4
 
 iparameter("points",1,1000,250)
-points = 250
+points = 2500
 
 clump_factor = clumps / points
 
@@ -31,7 +31,7 @@ function add_debris(ox,oy)
 end
 
 function neworigin()
-	return math.random() * WIDTH, math.random() * HEIGHT / 2 + HEIGHT / 2
+	return math.random() * WIDTH, math.random() * HEIGHT
 end
 -- this function to perform your initial setup
 function setup()
@@ -52,7 +52,7 @@ end
 function draw()
 	clump_factor=clumps/points
 
-	strokeWidth(4)
+	strokeWidth(3)
 	background(10,10,20)
 	local done = true
 	for i, debris in ipairs(debris_list) do
@@ -65,8 +65,9 @@ function draw()
 			debris.dy = debris.dy + Gravity.y / gdiv
 			debris.cycles = debris.cycles + 1
 			if debris.cycles > maxcycles or
-				math.abs(debris.x) > WIDTH or
-				math.abs(debris.y) > HEIGHT then
+				debris.x > WIDTH or
+				debris.x < 0 or
+				debris.y > HEIGHT then
 				debris.active = false
 			end
 		end
