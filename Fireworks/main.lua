@@ -33,7 +33,7 @@ end
 function neworigin()
 	return math.random() * WIDTH, math.random() * HEIGHT
 end
--- this function to perform your initial setup
+
 function setup()
 	go()
 end
@@ -48,7 +48,6 @@ function go()
 	sound(SOUND_EXPLODE)
 end
 
--- This function gets called once every frame
 function draw()
 	clump_factor=clumps/points
 
