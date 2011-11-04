@@ -195,6 +195,18 @@ function popMatrix()
 end
 
 -------------------
+-- Style Management
+-------------------
+function popStyle()
+end
+
+function pushStyle()
+end
+
+function resetStyle()
+end
+
+-------------------
 -- Sound
 -------------------
 function sound(name)
