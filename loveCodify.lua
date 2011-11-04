@@ -152,7 +152,11 @@ function rect(x,y,width,height)
 	love.graphics.setColor(255,255,255,255)
 end
 
-function sprite(filename,x,y,width,height)
+function sprite(filename,x,y,width,height) 
+    sprite_file(filename:gsub("\:","/") .. ".png",x,y,width,height)
+end
+
+function sprite_file(filename,x,y,width,height)
 	image = love.graphics.newImage( filename )
 	love.graphics.draw( image, x, y, 0, 0, 0, 0, 0 )
 end
