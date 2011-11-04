@@ -158,7 +158,8 @@ end
 
 function sprite_file(filename,x,y,width,height)
 	image = love.graphics.newImage( filename )
-	love.graphics.draw( image, x, y, 0, 0, 0, 0, 0 )
+	love.graphics.draw( image, x, y)
+    -- TODO implement width and height image scale
 end
 
 -------------------
