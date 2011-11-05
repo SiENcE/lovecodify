@@ -14,9 +14,12 @@ dofile ("loveCodify.lua")
 -------------------
 -- Drawing
 -------------------
+spriteList = {}
 
 iparameterList = {}
 parameterList = {}
+iwatchList = {}
+watchList = {}
 
 BEGAN = 1
 MOVING = 2
@@ -36,6 +39,7 @@ CurrentTouch.state = BEGAN
 Gravity = {}
 Gravity.x = 0
 Gravity.y = 0
+Gravity.z = 0
 
 -- Fill Modes - line | fill
 fillMode="line"
@@ -52,6 +56,10 @@ SQUARE = 2
 PROJECT = 3
 -- LineCap Modes
 lineCapsMode = ROUND
+
+-- TODO: hack
+ElapsedTime = 0
+DeltaTime = 0
 
 -- class.lua
 -- Compatible with Lua 5.1 (not 5.0).
@@ -119,15 +127,15 @@ function background(red,green,blue,alpha)
 	elseif (type(red) == "number" and type(green) == "number") then
 		love.graphics.setBackgroundColor( red, red, red, green)
 	elseif (type(red) == "number") then
-		love.graphics.setBackgroundColor( red, red, red, 1)
+		love.graphics.setBackgroundColor( red, red, red, 255)
 	elseif (red.r and red.g and red.b) then
 		love.graphics.setBackgroundColor( red.r, red.g, red.b)
 	end
 end
 
 function ellipse(x,y,width,heigt)
-	love.graphics.circle( fillMode, x, y, width/2 )
---	love.graphics.setColor(255,255,255,255)
+	love.graphics.circle( fillMode, x, y, width/2, 48 )
+	love.graphics.setColor(255,255,255,255)
 end
 
 function line(x1,y1,x2,y2)
@@ -142,8 +150,6 @@ function line(x1,y1,x2,y2)
 	else
 		love.graphics.line( x1, y1, x2, y2)
 	end
-	-- in love we have to reset the color after drawing
-	love.graphics.setColor(255,255,255,255)
 end
 
 function rect(x,y,width,height)
@@ -152,13 +158,35 @@ function rect(x,y,width,height)
 	love.graphics.setColor(255,255,255,255)
 end
 
+-- Load & Register Sprite or Draw it
 function sprite(filename,x,y,width,height) 
-    sprite_file(filename:gsub("\:","/") .. ".png",x,y,width,height)
+    if spriteList[filename] ~= nil then
+    	sprite_draw(spriteList[filename], x, y, width, height )
+    else
+	    local image = love.graphics.newImage( filename:gsub("\:","/") .. ".png" )
+	    spriteList[filename] = image
+    end
 end
 
-function sprite_file(filename,x,y,width,height)
-	image = love.graphics.newImage( filename )
-	love.graphics.draw( image, x, y)
+-- Draws a Sprite (Mirros it first)
+function sprite_draw( image, x, y, width, height )
+	-- reset Color before drawing, otherwise the sprites will be colored
+	love.graphics.setColor(255,255,255,255)
+
+	-- save coordinate system
+	love.graphics.push()
+	
+	-- rotate around the center of the screen by angle radians
+	love.graphics.translate(WIDTH/2, HEIGHT/2)
+	-- mirror screen on x-axis
+	love.graphics.scale(1, -1)
+	love.graphics.translate(-WIDTH/2-50, -HEIGHT/2-120)
+
+	love.graphics.draw( image, x, y )
+
+	-- restore coordinate system
+	love.graphics.pop()
+
     -- TODO implement width and height image scale
 end
 
@@ -194,28 +222,37 @@ function popMatrix()
 	love.graphics.pop()
 end
 
+function resetMatrix()
+	-- TODO
+end
+
 -------------------
 -- Style Management
 -------------------
 function popStyle()
+	-- TODO
 end
 
 function pushStyle()
+	-- TODO
 end
 
 function resetStyle()
+	-- TODO
 end
 
 -------------------
 -- Sound
 -------------------
 function sound(name)
+	-- TODO
 end
 
 -------------------
 -- Style
 -------------------
 function ellipseMode(mode)
+	-- TODO
 end
 
 -- fills elipse & rect
@@ -223,11 +260,11 @@ function fill(red,green,blue,alpha)
 	if (red and green and blue and alpha) then
 		love.graphics.setColor( red, green, blue, alpha)
 	elseif (red and green and blue) then
-		love.graphics.setColor( red, green, blue, 1)
+		love.graphics.setColor( red, green, blue, 255)
 	elseif (type(red) == "number" and type(green) == "number") then
 		love.graphics.setColor( red, red, red, green)
 	elseif (type(red) == "number") then
-		love.graphics.setColor( red, red, red, 1)
+		love.graphics.setColor( red, red, red, 255)
 	elseif (red.r and red.g and red.b and red.a) then
 		love.graphics.setColor( red.r, red.g, red.b, red.a)
 	end
@@ -239,6 +276,7 @@ function lineCapMode(mode)
 end
 
 function noSmooth()
+	-- TODO
 end
 
 function noFill()
@@ -249,6 +287,8 @@ function noStroke()
 end
 
 function noTint()
+	-- TODO
+	love.graphics.setColor(255,255,255,255)
 end
 
 function rectMode(mode)
@@ -256,17 +296,18 @@ function rectMode(mode)
 end
 
 function smooth()
+	-- TODO
 end
 
 function stroke(red,green,blue,alpha)
 	if (red and green and blue and alpha) then
 		love.graphics.setColor( red, green, blue, alpha)
 	elseif (red and green and blue) then
-		love.graphics.setColor( red, green, blue, 1)
+		love.graphics.setColor( red, green, blue, 255)
 	elseif (type(red) == "number" and type(green) == "number") then
 		love.graphics.setColor( red, red, red, green)
 	elseif (type(red) == "number") then
-		love.graphics.setColor( red, red, red, 1)
+		love.graphics.setColor( red, red, red, 255)
 	elseif (red.r and red.g and red.b and red.a) then
 		love.graphics.setColor( red.r, red.g, red.b, red.a)
 	end
@@ -280,11 +321,11 @@ function tint(red,green,blue,alpha)
 	if (red and green and blue and alpha) then
 		love.graphics.setColor( red, green, blue, alpha)
 	elseif (red and green and blue) then
-		love.graphics.setColor( red, green, blue, 1)
+		love.graphics.setColor( red, green, blue, 255)
 	elseif (type(red) == "number" and type(green) == "number") then
 		love.graphics.setColor( red, red, red, green)
 	elseif (type(red) == "number") then
-		love.graphics.setColor( red, red, red, 1)
+		love.graphics.setColor( red, red, red, 255)
 	elseif (red.r and red.g and red.b and red.a) then
 		love.graphics.setColor( red.r, red.g, red.b, red.a)
 	end
@@ -313,7 +354,12 @@ function parameter(name,mini,maxi,initial)
 	end
 end
 
-function watch()
+function watch(name)
+	watchList[name] = 0
+end
+
+function iwatch(name)
+	iwatchList[name] = 0
 end
 
 -------------------
@@ -322,10 +368,24 @@ end
 -- already done in love.update(dt)
 
 -------------------
+-- Math
+-------------------
+function rsqrt(value)
+  return math.pow(value, -0.5);
+end
+
+-------------------
 -- love functions
 -------------------
 function love.load()
 	setup()
+end
+
+-- TODO: wrong, never set to BEGAN again
+function love.mousepressed(x, y, button)
+   if button == "l" then
+      CurrentTouch.state = BEGAN
+   end
 end
 
 function love.mousereleased(x, y, button)
@@ -342,19 +402,19 @@ function love.update(dt)
 	
 	-- use Mouse for Touch interaction
 	if love.mouse.isDown("l") then
-		--TODO: lastPosition check
-		--CurrentTouch.state = BEGAN
-
 		-- get Mouse position as Touch position
 		-- publish globally
 		CurrentTouch.x = love.mouse.getX()
-		CurrentTouch.y = love.mouse.getY()
-		CurrentTouch.state = MOVING
+		CurrentTouch.y = HEIGHT-love.mouse.getY()
+		
+		-- TODO: this compromise the BEGAN state, need to find other solution
+--		CurrentTouch.state = MOVING
 		
 		-- publish to touched callback
 		local touch = {}
 		touch.x = CurrentTouch.x
 		touch.y = CurrentTouch.y
+		touch.id = 1 -- TODO: What does ID this mean?
 		if touched then touched(touch) end
 	end
 
@@ -367,11 +427,32 @@ function love.update(dt)
 		Gravity.x = Gravity.x + 0.01
 	elseif love.keyboard.isDown("right") then
 		Gravity.x = Gravity.x - 0.01
+	elseif love.keyboard.isDown("pageup") then
+		Gravity.z = Gravity.z + 0.01
+	elseif love.keyboard.isDown("pagedown") then
+		Gravity.z = Gravity.z - 0.01
 	end
+
+	-- set Time Values
+	DeltaTime = love.timer.getDelta()
+	ElapsedTime = love.timer.getTime()
 end
 
 function love.draw()
+	-- save coordinate system
+	love.graphics.push()
+	
+	-- rotate around the center of the screen by angle radians
+	love.graphics.translate(WIDTH/2, HEIGHT/2)
+	-- mirror screen on Y-axis
+	love.graphics.scale(1, -1)
+	love.graphics.translate(-WIDTH/2, -HEIGHT/2)
+	
 	draw()
+
+	-- restore coordinate system
+	love.graphics.pop()
+
 
 	love.graphics.setColor( 125, 125, 125)
 	love.graphics.print( "iparameter", 5, 14)
@@ -383,12 +464,30 @@ function love.draw()
 		i=i+1
 	end
 	
-	love.graphics.print( "parameter", 5, 300+14)
+	love.graphics.print( "parameter", 5, 200+14)
 	i=2
 	for k,v in pairs(parameterList) do
 		parameterList[k]=_G[k]
-		love.graphics.print( k, 5, 300+14*i)
-		love.graphics.print( tostring(v), 80, 300+14*i)
+		love.graphics.print( k, 5, 200+14*i)
+		love.graphics.print( tostring(v), 80, 200+14*i)
+		i=i+1
+	end
+	
+	love.graphics.print( "watch", 5, 400+14)
+	i=2
+	for k,v in pairs(watchList) do
+		watchList[k]=_G[k]
+		love.graphics.print( k, 5, 400+14*i)
+		love.graphics.print( tostring(watchList[k]), 80, 400+14*i)
+		i=i+1
+	end
+	
+	love.graphics.print( "iwatch", 5, 600+14)
+	i=2
+	for k,v in pairs(iwatchList) do
+		iwatchList[k]=_G[k]
+		love.graphics.print( k, 5, 600+14*i)
+		love.graphics.print( tostring(iwatchList[k]), 80, 600+14*i)
 		i=i+1
 	end
 
@@ -402,6 +501,8 @@ function love.draw()
 	love.graphics.print( Gravity.x, WIDTH-35, 34)
 	love.graphics.print( "GravityY: ", WIDTH-92, 54)
 	love.graphics.print( Gravity.y, WIDTH-35, 54)
+	love.graphics.print( "GravityZ: ", WIDTH-92, 74)
+	love.graphics.print( Gravity.z, WIDTH-35, 74)
 	-- in love we have to reset the color after drawing
 	love.graphics.setColor(255,255,255,255)
 end
