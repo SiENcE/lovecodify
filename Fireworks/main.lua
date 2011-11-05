@@ -15,7 +15,7 @@ points = 2500
 clump_factor = clumps / points
 
 iparameter("maxvel",1,100,10)
-maxvel= 10
+maxvel= 7 -- tuned by my beautiful assistant
 
 iparameter("maxcycles",1,1500,750)
 maxcycles=750
@@ -23,15 +23,16 @@ maxcycles=750
 parameter("gdiv",0.1,5,1.5)
 gdiv = 1.5
 
-function add_debris(ox,oy)
+function add_debris(_ox,_oy,_col)
 	local vel=math.random() * maxvel
 	local angle = math.random() * 2 * math.pi
-	return {x = ox or 0, y = oy or 0, dx = vel * math.cos(angle),
-	dy=vel*math.sin(angle),active=true, cycles=math.random(1,maxcycles)}
+	return {x = _ox or 0, y = _oy or 0, dx = vel * math.cos(angle),
+	dy=vel*math.sin(angle),active=true, cycles=math.random(1,maxcycles), ox = _ox, oy = _oy, col = _col
+	}
 end
 
 function neworigin()
-	return math.random() * WIDTH, math.random() * HEIGHT
+	return math.random() * WIDTH, math.random() * HEIGHT, { 255*math.random(),255*math.random(),255*math.random() }
 end
 
 function setup()
@@ -39,23 +40,22 @@ function setup()
 end
 
 function go()
-	ox, oy = neworigin()
+	local ox, oy, col = neworigin()
 	for i= 1, points do
-		if math.random() < clump_factor then ox, oy = neworigin() end
-		debris_list[i]=add_debris(ox,oy)
+		if math.random() < clump_factor then ox, oy, col = neworigin() end
+		debris_list[i]=add_debris(ox,oy, col)
 	end
-	print("Boom")
 	sound(SOUND_EXPLODE)
 end
 
 function draw()
 	clump_factor=clumps/points
 
-	strokeWidth(3)
+	strokeWidth(2)
 	background(10,10,20)
 	local done = true
 	for i, debris in ipairs(debris_list) do
-		stroke (255*math.random(),255*math.random(),255*math.random(), 255 - (debris.cycles / maxcycles) * 255)
+		stroke (debris.col[1],debris.col[2],debris.col[3], 255 - (debris.cycles / maxcycles) * 255)
 		if debris.active then
 			done=false
 			line(debris.x,debris.y, debris.x, debris.y)
@@ -72,7 +72,6 @@ function draw()
 		end
 	end
 	if done then
-		print("ooooh")
 		go()
 	end
 end
