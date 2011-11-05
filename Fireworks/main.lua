@@ -40,28 +40,32 @@ function setup()
 end
 
 function go()
+	clump_factor=clumps/points
+
 	local ox, oy, col = neworigin()
 	for i= 1, points do
 		if math.random() < clump_factor then ox, oy, col = neworigin() end
 		debris_list[i]=add_debris(ox,oy, col)
 	end
 	sound(SOUND_EXPLODE)
+	strokeWidth(2)
+	noSmooth()
+	background(10,10,20)
 end
 
 function draw()
-	clump_factor=clumps/points
-
-	strokeWidth(2)
-	background(10,10,20)
+	
 	local done = true
 	for i, debris in ipairs(debris_list) do
 		stroke (debris.col[1],debris.col[2],debris.col[3], 255 - (debris.cycles / maxcycles) * 255)
 		if debris.active then
 			done=false
-			line(debris.x,debris.y, debris.x, debris.y)
+			local ox = debris.x
+			local oy = debris.y
 			debris.x = debris.x + debris.dx
 			debris.y = debris.y + debris.dy
 			debris.dy = debris.dy + Gravity.y / gdiv
+			line(ox,oy, debris.x, debris.y)
 			debris.cycles = debris.cycles + 1
 			if debris.cycles > maxcycles or
 				debris.x > WIDTH or
