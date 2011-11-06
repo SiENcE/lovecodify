@@ -11,6 +11,13 @@ Just include the this in your Codify project:
 dofile ("loveCodify.lua")
 ]]--
 
+------------------------
+-- loveCodify SETTINGS
+------------------------
+if MIRROR == nil then
+    MIRROR = true
+end
+
 -------------------
 -- Drawing
 -------------------
@@ -64,47 +71,47 @@ DeltaTime = 0
 -- class.lua
 -- Compatible with Lua 5.1 (not 5.0).
 function class(base, init)
-   local c = {}    -- a new class instance
-   if not init and type(base) == 'function' then
-      init = base
-      base = nil
-   elseif type(base) == 'table' then
-    -- our new class is a shallow copy of the base class!
-      for i,v in pairs(base) do
-         c[i] = v
-      end
-      c._base = base
-   end
-   -- the class will be the metatable for all its objects,
-   -- and they will look up their methods in it.
-   c.__index = c
+	local c = {}    -- a new class instance
+	if not init and type(base) == 'function' then
+		init = base
+		base = nil
+	elseif type(base) == 'table' then
+		-- our new class is a shallow copy of the base class!
+		for i,v in pairs(base) do
+			c[i] = v
+		end
+		c._base = base
+	end
+	-- the class will be the metatable for all its objects,
+	-- and they will look up their methods in it.
+	c.__index = c
 
-   -- expose a constructor which can be called by <classname>(<args>)
-   local mt = {}
-   mt.__call = function(class_tbl, ...)
-   local obj = {}
-   setmetatable(obj,c)
-   if class_tbl.init then
-      class_tbl.init(obj,...)
-   else 
-      -- make sure that any stuff from the base class is initialized!
-      if base and base.init then
-      base.init(obj, ...)
-      end
-   end
-   return obj
-   end
-   c.init = init
-   c.is_a = function(self, klass)
-      local m = getmetatable(self)
-      while m do 
-         if m == klass then return true end
-         m = m._base
-      end
-      return false
-   end
-   setmetatable(c, mt)
-   return c
+	-- expose a constructor which can be called by <classname>(<args>)
+	local mt = {}
+	mt.__call = function(class_tbl, ...)
+		local obj = {}
+		setmetatable(obj,c)
+		if class_tbl.init then
+			class_tbl.init(obj,...)
+		else 
+			-- make sure that any stuff from the base class is initialized!
+			if base and base.init then
+				base.init(obj, ...)
+			end
+		end
+		return obj
+	end
+	c.init = init
+	c.is_a = function(self, klass)
+		local m = getmetatable(self)
+		while m do 
+			if m == klass then return true end
+			m = m._base
+		end
+		return false
+	end
+	setmetatable(c, mt)
+	return c
 end
 
 -------------------
@@ -144,10 +151,8 @@ function line(x1,y1,x2,y2)
 --The width of the line.
 --LineStyle style ("smooth")
 --The LineStyle to use.
-	
-	--fix for codify, love2d does not paint a line if values are the same
 	if (x1==x2 and y1==y2) then
-		love.graphics.line( x1, y1, x2+1, y2+1)
+		love.graphics.point(x1, y1)
 	else
 		love.graphics.line( x1, y1, x2, y2)
 	end
@@ -156,44 +161,63 @@ end
 function rect(x,y,width,height)
 	love.graphics.rectangle(fillMode,x,y,width,height)
 	-- in love we have to reset the color after drawing
-	love.graphics.setColor(255,255,255,255)
+	_resetColor()
 end
 
--- Load & Register Sprite or Draw it
+-- Load & Register Sprite and Draw it
 function sprite(filename,x,y,width,height) 
-    if spriteList[filename] ~= nil then
-    	sprite_draw(spriteList[filename], x, y, width, height )
-    else
-	    local image = love.graphics.newImage( filename:gsub("\:","/") .. ".png" )
-	    spriteList[filename] = image
-    end
+	if spriteList[filename] == nil then
+		spriteList[filename] = love.graphics.newImage(filename:gsub("\:","/") .. ".png")
+	end
+	sprite_draw(spriteList[filename], x, y, width, height )
 end
 
--- Draws a Sprite (Mirros it first)
+-- Draws a Sprite (Mirror it first)
 function sprite_draw( image, x, y, width, height )
 	-- reset Color before drawing, otherwise the sprites will be colored
 	-- because sadly Codify does not support coloring of sprites
 	local r, g, b, a = love.graphics.getColor()
-	love.graphics.setColor(255,255,255,255)
+    
+	_resetColor()
 
-	-- save coordinate system
-	love.graphics.push()
-	
-	-- rotate around the center of the screen by angle radians
-	love.graphics.translate(WIDTH/2, HEIGHT/2)
-	-- mirror screen on x-axis
-	love.graphics.scale(1, -1)
-	love.graphics.translate(-WIDTH/2 - image:getWidth()/2, -HEIGHT/2 - image:getHeight()/2)
+	_mirrorScreenBegin(image:getWidth(), image:getHeight())
 
 	love.graphics.draw( image, x, y )
 
 	-- restore coordinate system
-	love.graphics.pop()
+	_mirrorScreenEnd()
 
 	-- reset last Color
 	love.graphics.setColor(r, g, b, a)
 	
     -- TODO implement width and height image scale
+end
+
+function _resetColor() 
+	love.graphics.setColor(255,255,255,255)
+end
+
+function _mirrorScreenBegin(width, height)
+	if MIRROR == true then
+		-- save coordinate system
+		love.graphics.push()
+
+		-- rotate around the center of the screen by angle radians
+		love.graphics.translate(WIDTH/2, HEIGHT/2)
+		-- mirror screen on x-axis
+		love.graphics.scale(1, -1)
+
+		width = width or 0
+		height = height or 0
+		love.graphics.translate(-WIDTH/2 - width/2, -HEIGHT/2 - height/2)
+	end
+end
+
+function _mirrorScreenEnd()
+	if MIRROR == true then
+		-- save coordinate system
+		love.graphics.pop()
+	end 
 end
 
 -------------------
@@ -389,15 +413,15 @@ end
 
 -- TODO: wrong, never set to BEGAN again
 function love.mousepressed(x, y, button)
-   if button == "l" then
-      CurrentTouch.state = BEGAN
-   end
+	if button == "l" then
+		CurrentTouch.state = BEGAN
+	end
 end
 
 function love.mousereleased(x, y, button)
-   if button == "l" then
-      CurrentTouch.state = ENDED
-   end
+	if button == "l" then
+		CurrentTouch.state = ENDED
+	end
 end
 
 function love.update(dt)
@@ -410,17 +434,18 @@ function love.update(dt)
 	if love.mouse.isDown("l") then
 		-- get Mouse position as Touch position
 		-- publish globally
-		CurrentTouch.x = love.mouse.getX()
-		CurrentTouch.y = HEIGHT - love.mouse.getY()
-
-		-- TODO: this compromise the BEGAN state, need to find other solution
---		CurrentTouch.state = MOVING
+		if CurrentTouch.x ~= love.mouse.getX() or CurrentTouch.y ~= love.mouse.getY() then
+			CurrentTouch.x = love.mouse.getX()
+			CurrentTouch.y = love.mouse.getY()
+			CurrentTouch.state = MOVING
+		end
 		
 		-- publish to touched callback
 		local touch = {}
 		touch.x = CurrentTouch.x
 		touch.y = CurrentTouch.y
 		touch.id = 1 -- TODO: What does ID this mean?
+        
 		if touched then touched(touch) end
 	end
 
@@ -445,20 +470,9 @@ function love.update(dt)
 end
 
 function love.draw()
-	-- save coordinate system
-	love.graphics.push()
-	
-	-- rotate around the center of the screen by angle radians
-	love.graphics.translate(WIDTH/2, HEIGHT/2)
-	-- mirror screen on Y-axis
-	love.graphics.scale(1, -1)
-	love.graphics.translate(-WIDTH/2, -HEIGHT/2)
-	
+	_mirrorScreenBegin()
 	draw()
-
-	-- restore coordinate system
-	love.graphics.pop()
-
+	_mirrorScreenEnd()
 
 	love.graphics.setColor( 125, 125, 125)
 	love.graphics.print( "iparameter", 5, 14)
@@ -469,7 +483,7 @@ function love.draw()
 		love.graphics.print( tostring(v), 80, 14*i)
 		i=i+1
 	end
-	
+
 	love.graphics.print( "parameter", 5, 200+14)
 	i=2
 	for k,v in pairs(parameterList) do
@@ -478,7 +492,7 @@ function love.draw()
 		love.graphics.print( tostring(v), 80, 200+14*i)
 		i=i+1
 	end
-	
+
 	love.graphics.print( "watch", 5, 400+14)
 	i=2
 	for k,v in pairs(watchList) do
@@ -487,7 +501,7 @@ function love.draw()
 		love.graphics.print( tostring(watchList[k]), 80, 400+14*i)
 		i=i+1
 	end
-	
+
 	love.graphics.print( "iwatch", 5, 600+14)
 	i=2
 	for k,v in pairs(iwatchList) do
@@ -510,7 +524,7 @@ function love.draw()
 	love.graphics.print( "GravityZ: ", WIDTH-92, 74)
 	love.graphics.print( Gravity.z, WIDTH-35, 74)
 	-- in love we have to reset the color after drawing
-	love.graphics.setColor(255,255,255,255)
+	_resetColor()
 end
 
 -- initial before main is called
