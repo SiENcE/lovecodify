@@ -10,7 +10,7 @@ Beware, it's unfinished, but samples are running.
 Just include the this in your Codify project:
 dofile ("loveCodify.lua")
 ]]--
-
+factor = 300
 -------------------
 -- Drawing
 -------------------
@@ -56,6 +56,9 @@ SQUARE = 2
 PROJECT = 3
 -- LineCap Modes
 lineCapsMode = ROUND
+
+-- Ellipse Modes
+ellipMode = RADIUS
 
 -- TODO: hack
 ElapsedTime = 0
@@ -134,9 +137,13 @@ function background(red,green,blue,alpha)
 end
 
 -- TODO: this is not an elipse right now :-(
-function ellipse(x,y,width,heigt)
-	love.graphics.circle( fillMode, x, y, width/2, 48 )
---	love.graphics.setColor(255,255,255,255)
+function ellipse( x, y, width, height)
+	if width == height then
+		love.graphics.circle( fillMode, x, y, (width+height)/2, 48 )
+	else
+		love.graphics.circle( fillMode, x, y, width/2, 48 )
+	end
+--	love.graphics.setColor(0,0,0,255)
 end
 
 function line(x1,y1,x2,y2)
@@ -156,7 +163,7 @@ end
 function rect(x,y,width,height)
 	love.graphics.rectangle(fillMode,x,y,width,height)
 	-- in love we have to reset the color after drawing
-	love.graphics.setColor(255,255,255,255)
+--	love.graphics.setColor(255,255,255,255)
 end
 
 -- Load & Register Sprite or Draw it
@@ -258,7 +265,7 @@ end
 -- Style
 -------------------
 function ellipseMode(mode)
-	-- TODO
+	ellipMode = mode
 end
 
 -- fills elipse & rect
