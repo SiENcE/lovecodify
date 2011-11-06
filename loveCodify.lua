@@ -133,9 +133,10 @@ function background(red,green,blue,alpha)
 	end
 end
 
+-- TODO: this is not an elipse right now :-(
 function ellipse(x,y,width,heigt)
 	love.graphics.circle( fillMode, x, y, width/2, 48 )
-	love.graphics.setColor(255,255,255,255)
+--	love.graphics.setColor(255,255,255,255)
 end
 
 function line(x1,y1,x2,y2)
@@ -171,6 +172,8 @@ end
 -- Draws a Sprite (Mirros it first)
 function sprite_draw( image, x, y, width, height )
 	-- reset Color before drawing, otherwise the sprites will be colored
+	-- because sadly Codify does not support coloring of sprites
+	local r, g, b, a = love.graphics.getColor()
 	love.graphics.setColor(255,255,255,255)
 
 	-- save coordinate system
@@ -180,13 +183,16 @@ function sprite_draw( image, x, y, width, height )
 	love.graphics.translate(WIDTH/2, HEIGHT/2)
 	-- mirror screen on x-axis
 	love.graphics.scale(1, -1)
-	love.graphics.translate(-WIDTH/2-50, -HEIGHT/2-120)
+	love.graphics.translate(-WIDTH/2 - image:getWidth()/2, -HEIGHT/2 - image:getHeight()/2)
 
 	love.graphics.draw( image, x, y )
 
 	-- restore coordinate system
 	love.graphics.pop()
 
+	-- reset last Color
+	love.graphics.setColor(r, g, b, a)
+	
     -- TODO implement width and height image scale
 end
 
@@ -280,7 +286,7 @@ function noSmooth()
 end
 
 function noFill()
-	fillmode = "line"
+	fillMode = "line"
 end
 
 function noStroke()
@@ -405,8 +411,8 @@ function love.update(dt)
 		-- get Mouse position as Touch position
 		-- publish globally
 		CurrentTouch.x = love.mouse.getX()
-		CurrentTouch.y = HEIGHT-love.mouse.getY()
-		
+		CurrentTouch.y = HEIGHT - love.mouse.getY()
+
 		-- TODO: this compromise the BEGAN state, need to find other solution
 --		CurrentTouch.state = MOVING
 		
