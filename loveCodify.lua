@@ -148,7 +148,7 @@ end
 
 function ellipse( x, y, width, height)
 	if width == height then
-		love.graphics.circle( fillMode, x, y, (width+height)/2, 50 )
+		love.graphics.circle( fillMode, x, y, (width+height)/4, 50 )
 	elseif height == nil then
 		love.graphics.circle( fillMode, x, y, width/2, 50 )
 	else
