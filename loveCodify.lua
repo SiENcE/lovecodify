@@ -143,14 +143,33 @@ function background(red,green,blue,alpha)
 	end
 end
 
--- TODO: this is not an elipse right now :-(
 function ellipse( x, y, width, height)
 	if width == height then
-		love.graphics.circle( fillMode, x, y, (width+height)/2, 48 )
+		love.graphics.circle( fillMode, x, y, (width+height)/2, 50 )
+	elseif height == nil then
+		love.graphics.circle( fillMode, x, y, width/2, 50 )
 	else
-		love.graphics.circle( fillMode, x, y, width/2, 48 )
+		ellipse2( x, y, width/2, height/2 )
 	end
 --	love.graphics.setColor(0,0,0,255)
+end
+
+-- Love2d does not have a ellipse function, so we have todo it by ourself
+-- TODO: the ellipse is not filled right now
+-- a & b are axis-radius
+function ellipse2(x,y,a,b) --,stp,rot)
+ local stp=50	-- Step is # of line segments (more is "better")
+ local rot=0	-- Rotation in degrees
+ local n,m=math,rad,al,sa,ca,sb,cb,ox,oy,x1,y1,ast
+ m = math; rad = m.pi/180; ast = rad * 360/stp;
+ sb = m.sin(-rot * rad); cb = m.cos(-rot * rad)
+ for n = 0, stp, 1 do
+  ox = x1; oy = y1;
+  sa = m.sin(ast*n) * b; ca = m.cos(ast*n) * a
+  x1 = x + ca * cb - sa * sb
+  y1 = y + ca * sb + sa * cb
+  if (n > 0) then line(ox,oy,x1,y1); end
+ end
 end
 
 function line(x1,y1,x2,y2)
