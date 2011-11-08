@@ -17,6 +17,9 @@ dofile ("loveCodify.lua")
 if MIRROR == nil then
     MIRROR = true
 end
+if LOVECODIFYHUD == nil then
+	LOVECODIFYHUD = true
+end
 
 -------------------
 -- Drawing
@@ -500,6 +503,7 @@ function love.draw()
 	draw()
 	_mirrorScreenEnd()
 
+    if (LOVECODIFYHUD) then
 	love.graphics.setColor( 125, 125, 125)
 	love.graphics.print( "iparameter", 5, 14)
 	local i=2
@@ -549,6 +553,8 @@ function love.draw()
 	love.graphics.print( Gravity.y, WIDTH-35, 54)
 	love.graphics.print( "GravityZ: ", WIDTH-92, 74)
 	love.graphics.print( Gravity.z, WIDTH-35, 74)
+    end -- if (LOVECODIFYHUD)
+    
 	-- in love we have to reset the color after drawing
 	_resetColor()
 end
