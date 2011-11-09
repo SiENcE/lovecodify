@@ -1,5 +1,6 @@
-dofile ("loveCodify.lua")
-
+if dofile ~= nil then
+	dofile ("loveCodify.lua")
+end
 
 Animal = class()
 

@@ -1,4 +1,7 @@
-dofile ("loveCodify.lua")
+if dofile ~= nil then
+	dofile ("loveCodify.lua")
+end
+
 
 LONGLINE = math.pow(3,6)
 -- Use this function to perform your initial setup

@@ -1,9 +1,10 @@
 -- got it from here
 -- credits to brab
 -- http://twolivesleft.com/Codea/Talk/discussion/85/minimalist-drawing-program
-
-dofile ("loveCodify.lua")
-dofile ("Draw/Touch.lua")
+if dofile ~= nil then
+	dofile ("loveCodify.lua")
+	dofile ("Draw/Touch.lua")
+end
 
 tt = nil
 

@@ -2,7 +2,9 @@
 -- based on version for PSP by Nils - ventoline.com
 -- modified for Codea - Tom Bortels November 2011
 -- got it from here: https://gist.github.com/1334810
-dofile ("loveCodify.lua")
+if dofile ~= nil then
+	dofile ("loveCodify.lua")
+end
 
 function setup() 
 --focal length to determine perspective scaling

@@ -2,11 +2,13 @@
 -- credits to voiceoftreason
 -- http://twolivesleft.com/Codea/Talk/discussion/comment/46
 -- https://gist.github.com/1328664
-dofile ("loveCodify.lua")
+if dofile ~= nil then
+	dofile ("loveCodify.lua")
+	dofile ("Breakout/Game object classes.lua")
+	dofile ("Breakout/Levels.lua")
+	dofile ("Breakout/Numbers.lua")
+end
 
-dofile ("Breakout/Game object classes.lua")
-dofile ("Breakout/Levels.lua")
-dofile ("Breakout/Numbers.lua")
 -------------------------
 -- Main game functions --
 -------------------------

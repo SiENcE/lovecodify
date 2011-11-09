@@ -1,6 +1,8 @@
 -- http://twolivesleft.com/Codea/Talk/discussion/94/try-my-little-game-%3A-taptap...
 -- http://pastebin.com/fu8eRLqE
-dofile ("loveCodify.lua")
+if dofile ~= nil then
+	dofile ("loveCodify.lua")
+end
 
 -------------------------
 -- Main game functions --

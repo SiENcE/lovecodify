@@ -1,4 +1,6 @@
-dofile ("loveCodify.lua")
+if dofile ~= nil then
+	dofile ("loveCodify.lua")
+end
 
 --[[ ------------------------------------------------------------
                            Main.lua
@@ -428,6 +430,7 @@ function Track:draw()
         line(self.bottomL.x,self.bottomL.y,self.horizonX,horizonY)
         line(self.bottomR.x,self.bottomR.y,self.horizonX,horizonY)
     else
+    	print(self.centerL.x,self.centerL.y,self.rL,self.rL)
         -- we're turning
         strokeWidth(3)
         noFill()

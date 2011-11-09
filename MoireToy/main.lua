@@ -2,7 +2,9 @@
 -- credits to blissapp
 -- http://twolivesleft.com/Codify/Talk/discussion/33/my-first-prog-moire-toy
 -- https://gist.github.com/1326466
-dofile ("loveCodify.lua")
+if dofile ~= nil then
+	dofile ("loveCodify.lua")
+end
 
 --simple moire toy in Lua for iPad Codify
 --blissapp

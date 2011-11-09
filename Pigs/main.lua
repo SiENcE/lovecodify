@@ -2,7 +2,9 @@
 -- credits to ruilov
 -- http://twolivesleft.com/Codify/Talk/discussion/20/my-first-app-pigs-in-clover
 -- https://gist.github.com/1330422
-dofile ("loveCodify.lua") 
+if dofile ~= nil then
+	dofile ("loveCodify.lua")
+end
 
 backgroundC = color(0, 0, 0, 255)
 time = 0

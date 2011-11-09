@@ -2,7 +2,9 @@
 -- credits to Ipda41001
 -- http://twolivesleft.com/Codify/Talk/discussion/23/day-night-background-colorizer-with-speed-parm
 -- http://pastebin.com/B0FtrE1f
-dofile ("loveCodify.lua")
+if dofile ~= nil then
+	dofile ("loveCodify.lua")
+end
 
 --day/night background colorizer with speed parm
 

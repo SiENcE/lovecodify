@@ -1,11 +1,11 @@
-dofile ("loveCodify.lua")
-
-dofile ("Abduction/person.lua")
-dofile ("Abduction/ship.lua")
-dofile ("Abduction/streamingLines.lua")
+if dofile ~= nil then
+	dofile ("loveCodify.lua")
+	dofile ("Abduction/person.lua")
+	dofile ("Abduction/ship.lua")
+	dofile ("Abduction/streamingLines.lua")
+end
 
 -- Main code
-
 
 -- Use this function to perform your initial setup
 function setup()

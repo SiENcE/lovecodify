@@ -1,7 +1,10 @@
 -- got it from here
 -- credits to Ipda41001
 -- http://twolivesleft.com/Codea/Talk/discussion/78/vec2-example
-dofile ("loveCodify.lua")
+if dofile ~= nil then
+	dofile ("loveCodify.lua")
+end
+
 
 function setup()
     x1 = 123

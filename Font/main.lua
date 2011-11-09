@@ -1,6 +1,8 @@
-dofile("loveCodify.lua")
+if dofile ~= nil then
+	dofile ("loveCodify.lua")
+	dofile("Font/packedromans.lua")
+end
 
-dofile("Font/packedromans.lua")
 
 -- Just a "Main" tab for Codea to demo the class
 

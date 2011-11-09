@@ -1,7 +1,9 @@
 -- got it from here
 -- credits to ???
 -- http://pastebin.com/F94Kt35D
-dofile ("loveCodify.lua") 
+if dofile ~= nil then
+	dofile ("loveCodify.lua")
+end
 
 p={}
 ps=1000

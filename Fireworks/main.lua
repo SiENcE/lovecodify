@@ -2,7 +2,9 @@
 -- credits to Robert Rainthorpe & blissapp
 -- http://twolivesleft.com/Codify/Talk/discussion/34/my-first-lua-script-fireworks
 -- https://gist.github.com/1326513
-dofile ("loveCodify.lua")
+if dofile ~= nil then
+	dofile ("loveCodify.lua")
+end
 
 debris_list = {}
 
