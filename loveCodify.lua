@@ -147,10 +147,10 @@ function background(red,green,blue,alpha)
 end
 
 function ellipse( x, y, width, height)
-	if width == height then
-		love.graphics.circle( fillMode, x, y, (width+height)/4, 50 )
-	elseif height == nil then
+	if height == nil then
 		love.graphics.circle( fillMode, x, y, width/2, 50 )
+	elseif width == height then
+		love.graphics.circle( fillMode, x, y, (width+height)/2, 50 )
 	else
 		ellipse2( x, y, width/2, height/2 )
 	end
@@ -197,7 +197,9 @@ function sprite(filename,x,y,width,height)
 	if spriteList[filename] == nil then
 		spriteList[filename] = love.graphics.newImage(filename:gsub("\:","/") .. ".png")
 	end
-	sprite_draw(spriteList[filename], x, y, width, height )
+	if x == nil then x=0 end
+	if y == nil then y=0 end
+	sprite_draw(spriteList[filename], x, HEIGHT-y, width, height )
 end
 
 -- Draws a Sprite (Mirror it first)
@@ -464,17 +466,20 @@ function love.update(dt)
 		-- publish globally
 		if CurrentTouch.x ~= love.mouse.getX() or CurrentTouch.y ~= love.mouse.getY() then
 			CurrentTouch.x = love.mouse.getX()
-			CurrentTouch.y = HEIGHT - love.mouse.getY()
+			CurrentTouch.y = HEIGHT - 1 - love.mouse.getY()
 			CurrentTouch.state = MOVING
 		end
-		
+	end
+
+	-- has to be outside of mouse.isDown
+	if touched then
 		-- publish to touched callback
 		local touch = {}
 		touch.x = CurrentTouch.x
 		touch.y = CurrentTouch.y
+        touch.state = CurrentTouch.state
 		touch.id = 1 -- TODO: What does ID this mean?
-        
-		if touched then touched(touch) end
+		touched(touch)
 	end
 
 	-- use Up,Down,Left,Right Keys to change Gravity
@@ -503,55 +508,55 @@ function love.draw()
 	_mirrorScreenEnd()
 
     if (LOVECODIFYHUD) then
-	love.graphics.setColor( 125, 125, 125)
-	love.graphics.print( "iparameter", 5, 14)
-	local i=2
-	for k,v in pairs(iparameterList) do
-		iparameterList[k]=_G[k]
-		love.graphics.print( k, 5, 14*i)
-		love.graphics.print( tostring(v), 80, 14*i)
-		i=i+1
-	end
-
-	love.graphics.print( "parameter", 5, 200+14)
-	i=2
-	for k,v in pairs(parameterList) do
-		parameterList[k]=_G[k]
-		love.graphics.print( k, 5, 200+14*i)
-		love.graphics.print( tostring(v), 80, 200+14*i)
-		i=i+1
-	end
-
-	love.graphics.print( "watch", 5, 400+14)
-	i=2
-	for k,v in pairs(watchList) do
-		watchList[k]=_G[k]
-		love.graphics.print( k, 5, 400+14*i)
-		love.graphics.print( tostring(watchList[k]), 80, 400+14*i)
-		i=i+1
-	end
-
-	love.graphics.print( "iwatch", 5, 600+14)
-	i=2
-	for k,v in pairs(iwatchList) do
-		iwatchList[k]=_G[k]
-		love.graphics.print( k, 5, 600+14*i)
-		love.graphics.print( tostring(iwatchList[k]), 80, 600+14*i)
-		i=i+1
-	end
-
-	-- print FPS
-	love.graphics.setColor(255,0,0,255)
-	love.graphics.print( "FPS: ", WIDTH-65, 14)
-	love.graphics.print( love.timer.getFPS( ), WIDTH-35, 14)
-
-	-- print Gravity
-	love.graphics.print( "GravityX: ", WIDTH-92, 34)
-	love.graphics.print( Gravity.x, WIDTH-35, 34)
-	love.graphics.print( "GravityY: ", WIDTH-92, 54)
-	love.graphics.print( Gravity.y, WIDTH-35, 54)
-	love.graphics.print( "GravityZ: ", WIDTH-92, 74)
-	love.graphics.print( Gravity.z, WIDTH-35, 74)
+		love.graphics.setColor( 125, 125, 125)
+		love.graphics.print( "iparameter", 5, 14)
+		local i=2
+		for k,v in pairs(iparameterList) do
+			iparameterList[k]=_G[k]
+			love.graphics.print( k, 5, 14*i)
+			love.graphics.print( tostring(v), 80, 14*i)
+			i=i+1
+		end
+	
+		love.graphics.print( "parameter", 5, 200+14)
+		i=2
+		for k,v in pairs(parameterList) do
+			parameterList[k]=_G[k]
+			love.graphics.print( k, 5, 200+14*i)
+			love.graphics.print( tostring(v), 80, 200+14*i)
+			i=i+1
+		end
+	
+		love.graphics.print( "watch", 5, 400+14)
+		i=2
+		for k,v in pairs(watchList) do
+			watchList[k]=_G[k]
+			love.graphics.print( k, 5, 400+14*i)
+			love.graphics.print( tostring(watchList[k]), 80, 400+14*i)
+			i=i+1
+		end
+	
+		love.graphics.print( "iwatch", 5, 600+14)
+		i=2
+		for k,v in pairs(iwatchList) do
+			iwatchList[k]=_G[k]
+			love.graphics.print( k, 5, 600+14*i)
+			love.graphics.print( tostring(iwatchList[k]), 80, 600+14*i)
+			i=i+1
+		end
+	
+		-- print FPS
+		love.graphics.setColor(255,0,0,255)
+		love.graphics.print( "FPS: ", WIDTH-65, 14)
+		love.graphics.print( love.timer.getFPS( ), WIDTH-35, 14)
+	
+		-- print Gravity
+		love.graphics.print( "GravityX: ", WIDTH-92, 34)
+		love.graphics.print( Gravity.x, WIDTH-35, 34)
+		love.graphics.print( "GravityY: ", WIDTH-92, 54)
+		love.graphics.print( Gravity.y, WIDTH-35, 54)
+		love.graphics.print( "GravityZ: ", WIDTH-92, 74)
+		love.graphics.print( Gravity.z, WIDTH-35, 74)
     end -- if (LOVECODIFYHUD)
     
 	-- in love we have to reset the color after drawing
