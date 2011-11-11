@@ -141,8 +141,10 @@ function background(red,green,blue,alpha)
 		love.graphics.setBackgroundColor( red, red, red, green)
 	elseif (type(red) == "number") then
 		love.graphics.setBackgroundColor( red, red, red, 255)
-	elseif (red.r and red.g and red.b) then
+	elseif red and (red.r and red.g and red.b) then
 		love.graphics.setBackgroundColor( red.r, red.g, red.b)
+	else
+		love.graphics.setBackgroundColor( 0, 0, 0)
 	end
 end
 
