@@ -21,6 +21,86 @@ if LOVECODIFYHUD == nil then
 	LOVECODIFYHUD = true
 end
 
+-- CODEA Dump https://gist.github.com/1375114
+--------------------------------------------------
+--[[ CODEA Constants, Variables and Functions ]]--
+--------------------------------------------------
+background = background or function() end
+BEGAN = 1
+CENTER = 2
+class = class or function() end
+color = color or function() end
+CORNER = 0
+CORNERS = 1
+CurrentTouch = {} --[[ Touch
+x:0.000000, y:0.000000
+prevX:0.000000, prevY:0.000000
+id:0
+state:0
+tapCount:0]]--
+DeltaTime = 0
+draw = draw or function() end
+ElapsedTime = 0
+ellipse = ellipse or function() end
+ellipseMode = ellipseMode or function() end
+ENDED = 4
+fill = fill or function() end
+Gravity = {} --[[ (0.000000, 0.000000, 0.000000)]]--
+HEIGHT = 748
+iparameter = iparameter or function() end
+iwatch = iwatch or function() end
+line = line or function() end
+lineCapMode = lineCapMode or function() end
+MOVING = 2
+noFill = noFill or function() end
+noise = noise or function() end
+noSmooth = noSmooth or function() end
+noStroke = noStroke or function() end
+noTint = noTint or function() end
+parameter = parameter or function() end
+point = point or function() end
+pointSize = pointSize or function() end
+popMatrix = popMatrix or function() end
+popStyle = popStyle or function() end
+print = print or function() end
+PROJECT = 2
+pushMatrix = pushMatrix or function() end
+pushStyle = pushStyle or function() end
+RADIUS = 3
+rect = rect or function() end
+rectMode = rectMode or function() end
+resetMatrix = resetMatrix or function() end
+resetStyle = resetStyle or function() end
+rotate = rotate or function() end
+ROUND = 0
+rsqrt = rsqrt or function() end
+scale = scale or function() end
+setInstructionLimit = setInstructionLimit or function() end
+setup = setup or function() end
+smooth = smooth or function() end
+sound = sound or function() end
+SOUND_BLIT = "blit"
+SOUND_EXPLODE = "explode"
+SOUND_HIT = "hit"
+SOUND_JUMP = "jump"
+SOUND_PICKUP = "pickup"
+SOUND_RANDOM = "random"
+SOUND_SHOOT = "shoot"
+sprite = sprite or function() end
+SQUARE = 1
+STATIONARY = 3
+stroke = stroke or function() end
+strokeWidth = strokeWidth or function() end
+tint = tint or function() end
+translate = translate or function() end
+UserAcceleration = {} --[[ (0.000000, 0.000000, 0.000000)]]--
+vec2 = vec2 or function() end
+vec3 = vec3 or function() end
+watch = watch or function() end
+WIDTH = 748
+zLevel = zLevel or function() end
+
+
 -------------------
 -- Drawing
 -------------------
@@ -31,20 +111,16 @@ parameterList = {}
 iwatchList = {}
 watchList = {}
 
-BEGAN = 1
-MOVING = 2
-ENDED = 3
-
 CurrentTouch = {}
 CurrentTouch.x = 0
 CurrentTouch.y = 0
---  CurrentTouch.prevX
---  CurrentTouch.prevY
+CurrentTouch.prevX = 0
+CurrentTouch.prevY = 0
 --  CurrentTouch.deltaX
 --  CurrentTouch.deltaY
---  CurrentTouch.id
-CurrentTouch.state = BEGAN
---  CurrentTouch.tapCount
+CurrentTouch.id = 0
+CurrentTouch.state = 0
+CurrentTouch.tapCount = 0
 
 Gravity = {}
 Gravity.x = 0
@@ -54,25 +130,13 @@ Gravity.z = 0
 -- Fill Modes - line | fill
 fillMode="line"
 
--- Rectangle Modes
-CENTER = 1
-RADIUS = 2
-CORNER = 3
-CORNERS = 4
 rectangleMode = CORNER
 
-ROUND = 1
-SQUARE = 2
-PROJECT = 3
 -- LineCap Modes
 lineCapsMode = ROUND
 
 -- Ellipse Modes
 ellipMode = RADIUS
-
--- TODO: hack
-ElapsedTime = 0
-DeltaTime = 0
 
 -- class.lua
 -- Compatible with Lua 5.1 (not 5.0).
@@ -199,57 +263,7 @@ function sprite(filename,x,y,width,height)
 	if spriteList[filename] == nil then
 		spriteList[filename] = love.graphics.newImage(filename:gsub("\:","/") .. ".png")
 	end
-	if x == nil then x=0 end
-	if y == nil then y=0 end
-	sprite_draw(spriteList[filename], x, HEIGHT-y, width, height )
-end
-
--- Draws a Sprite (Mirror it first)
-function sprite_draw( image, x, y, width, height )
-	-- reset Color before drawing, otherwise the sprites will be colored
-	-- because sadly Codify does not support coloring of sprites
-	local r, g, b, a = love.graphics.getColor()
-    
-	_resetColor()
-
-	_mirrorScreenBegin(image:getWidth(), image:getHeight())
-
-	love.graphics.draw( image, x, y )
-
-	-- restore coordinate system
-	_mirrorScreenEnd()
-
-	-- reset last Color
-	love.graphics.setColor(r, g, b, a)
-	
-    -- TODO implement width and height image scale
-end
-
-function _resetColor() 
-	love.graphics.setColor(255,255,255,255)
-end
-
-function _mirrorScreenBegin(width, height)
-	if MIRROR == true then
-		-- save coordinate system
-		love.graphics.push()
-
-		-- rotate around the center of the screen by angle radians
-		love.graphics.translate(WIDTH/2, HEIGHT/2)
-		-- mirror screen on x-axis
-		love.graphics.scale(1, -1)
-
-		width = width or 0
-		height = height or 0
-		love.graphics.translate(-WIDTH/2 - width/2, -HEIGHT/2 - height/2)
-	end
-end
-
-function _mirrorScreenEnd()
-	if MIRROR == true then
-		-- save coordinate system
-		love.graphics.pop()
-	end 
+	_sprite_draw(spriteList[filename], x or 0, HEIGHT - (y or 0 ), width, height )
 end
 
 -------------------
@@ -440,6 +454,7 @@ end
 -- love functions
 -------------------
 function love.load()
+	_saveInitialState()
 	setup()
 end
 
@@ -457,18 +472,23 @@ function love.mousereleased(x, y, button)
 end
 
 function love.update(dt)
+
 	-- Use sleep to cap FPS at 30
 	if dt < 1/30 then
 		love.timer.sleep(1000 * (1/30 - dt))
 	end
-	
+		
 	-- use Mouse for Touch interaction
 	if love.mouse.isDown("l") then
 		-- get Mouse position as Touch position
 		-- publish globally
 		if CurrentTouch.x ~= love.mouse.getX() or CurrentTouch.y ~= love.mouse.getY() then
 			CurrentTouch.x = love.mouse.getX()
-			CurrentTouch.y = HEIGHT - 1 - love.mouse.getY()
+			if MIRROR then
+				CurrentTouch.y = HEIGHT - 1 - love.mouse.getY()
+			else
+				CurrentTouch.y = love.mouse.getY()
+			end
 			CurrentTouch.state = MOVING
 		end
 	end
@@ -505,6 +525,17 @@ function love.update(dt)
 end
 
 function love.draw()
+	-- Reset
+	if love.keyboard.isDown("return") then
+		if not _restarting then
+			_restarting = true
+			_reset()
+		end
+		return
+	else
+		_restarting = false
+	end	
+
 	_mirrorScreenBegin()
 	draw()
 	_mirrorScreenEnd()
@@ -568,3 +599,92 @@ end
 -- initial before main is called
 WIDTH=love.graphics.getWidth()
 HEIGHT=love.graphics.getHeight()
+
+-------------------------
+-- loveCodify Internals
+-------------------------
+
+-- deepcopy http://lua-users.org/wiki/CopyTable
+function _deepcopy(object)
+    local lookup_table = {}
+    local function _copy(object)
+        if type(object) ~= "table" then
+            return object
+        elseif lookup_table[object] then
+            return lookup_table[object]
+        end
+        local new_table = {}
+        lookup_table[object] = new_table
+        for index, value in pairs(object) do
+            new_table[_copy(index)] = _copy(value)
+        end
+        return setmetatable(new_table, getmetatable(object))
+    end
+    return _copy(object)
+end
+
+function _saveInitialState()
+	_INIT_STATE = _deepcopy(_G)
+	_INIT_STATE["_G"] = nil
+end
+
+function _restoreInitialState()
+	for k, v in pairs(_INIT_STATE) do
+		_G[k] = v
+	end
+	_saveInitialState(_G)
+end
+
+function _reset()
+	_restoreInitialState()
+	setup()
+end
+
+
+function _resetColor() 
+	love.graphics.setColor(255,255,255,255)
+end
+
+function _mirrorScreenBegin(width, height)
+	if MIRROR then
+		-- save coordinate system
+		love.graphics.push()
+
+		-- rotate around the center of the screen by angle radians
+		love.graphics.translate(WIDTH/2, HEIGHT/2)
+		-- mirror screen on x-axis
+		love.graphics.scale(1, -1)
+
+		width = width or 0
+		height = height or 0
+		love.graphics.translate(-WIDTH/2 - width/2, -HEIGHT/2 - height/2)
+	end
+end
+
+function _mirrorScreenEnd()
+	if MIRROR then
+		-- save coordinate system
+		love.graphics.pop()
+	end 
+end
+
+-- Draws a Sprite (Mirror it first)
+function _sprite_draw( image, x, y, width, height )
+	-- reset Color before drawing, otherwise the sprites will be colored
+	-- because sadly Codify does not support coloring of sprites
+	local r, g, b, a = love.graphics.getColor()
+    
+	_resetColor()
+
+	_mirrorScreenBegin(image:getWidth(), image:getHeight())
+
+	love.graphics.draw( image, x, y )
+
+	-- restore coordinate system
+	_mirrorScreenEnd()
+
+	-- reset last Color
+	love.graphics.setColor(r, g, b, a)
+	
+    -- TODO implement width and height image scale
+end
